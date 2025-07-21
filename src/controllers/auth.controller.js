@@ -47,6 +47,29 @@ const verifyEmail = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+const registerEmployer = catchAsync(async (req, res) => {
+  const userBody = {
+    ...req.body,
+    role: 'employer',
+    isEmailVerified: true,
+  };
+
+  const user = await userService.createUser(userBody);
+  const tokens = await tokenService.generateAuthTokens(user);
+  res.status(httpStatus.CREATED).send({ user, tokens });
+});
+
+const loginEmployer = catchAsync(async (req, res) => {
+  const { email, password } = req.body;
+  const user = await authService.loginUserWithEmailAndPassword(email, password);
+
+  if (user.role !== 'employer') {
+    return res.status(httpStatus.UNAUTHORIZED).send({ message: 'Not authorized as employer' });
+  }
+
+  const tokens = await tokenService.generateAuthTokens(user);
+  res.send({ user, tokens });
+});
 module.exports = {
   register,
   login,
@@ -56,4 +79,6 @@ module.exports = {
   resetPassword,
   sendVerificationEmail,
   verifyEmail,
+  registerEmployer,
+  loginEmployer,
 };

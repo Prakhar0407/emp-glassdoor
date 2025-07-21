@@ -4,6 +4,8 @@ const userRoute = require('./user.route');
 const docsRoute = require('./docs.route');
 const reviewRoute = require('./review.route');
 const employeeRoute = require('./employee.route');
+const linkedinRoute = require('./linkedin.route');
+const employerAuthRoute = require('./employerAuth.route');
 
 const config = require('../../config/config');
 
@@ -13,6 +15,10 @@ const defaultRoutes = [
   {
     path: '/auth',
     route: authRoute,
+  },
+  {
+    path: '/employer-auth',
+    route: employerAuthRoute,
   },
   {
     path: '/users',
@@ -25,6 +31,10 @@ const defaultRoutes = [
   {
     path: '/employees',
     route: employeeRoute,
+  },
+  {
+    path: '/auth/linkedin',
+    route: linkedinRoute,
   },
 ];
 

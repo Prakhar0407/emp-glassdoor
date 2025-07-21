@@ -61,4 +61,12 @@ module.exports = {
     },
     from: envVars.EMAIL_FROM,
   },
+
+  linkedin: {
+    clientId: process.env.LINKEDIN_CLIENT_ID,
+    clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+    callbackUrl: process.env.LINKEDIN_CALLBACK_URL,
+  },
+  
 };
+

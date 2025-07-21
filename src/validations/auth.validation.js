@@ -49,6 +49,21 @@ const verifyEmail = {
   }),
 };
 
+const employerRegister = {
+  body: Joi.object().keys({
+    name: Joi.string().required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().required().custom(password),
+  }),
+};
+
+const employerLogin = {
+  body: Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   register,
   login,
@@ -57,4 +72,6 @@ module.exports = {
   forgotPassword,
   resetPassword,
   verifyEmail,
+  employerRegister,
+  employerLogin,
 };
