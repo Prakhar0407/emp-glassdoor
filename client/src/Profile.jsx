@@ -1,0 +1,37 @@
+import React, { useEffect, useState } from 'react';
+
+const Profile = () => {
+  const [user, setUser] = useState();
+
+  useEffect(() => {
+    const getData = async () => {
+      const response = await fetch('http://localhost:3000/v1/linkedin/get-user', {
+        method: 'get',
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log('Fetched User Data:', data.user);
+        setUser(data.user);
+      }
+    };
+
+    getData();
+  }, []);
+  return (
+    <div>
+      <h1>Profile</h1>
+      <p>Name: {user?.name}</p>
+      <p>Email: {user?.email}</p>
+      <p>Headline: {user?.headline}</p>
+      <p>
+        Avatar: <img src={user?.avatar} />
+      </p>
+      {/* <p>phone: {user?.phone}</p>
+      <p>Company: {user?.company}</p> */}
+    </div>
+  );
+};
+
+export default Profile;

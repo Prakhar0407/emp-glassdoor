@@ -34,8 +34,12 @@ const defaultRoutes = [
   },
   {
     path: '/auth/linkedin',
-    route: linkedinRoute,
+    route: authRoute,
   },
+  {
+    path: '/linkedin',
+    route: linkedinRoute,
+  }
 ];
 
 const devRoutes = [

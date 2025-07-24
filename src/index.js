@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-const app = require('./app');
+const app = require('./app'); // ✅ app has LinkedIn already configured
 const config = require('./config/config');
 const logger = require('./config/logger');
 
-let server;
+let server; 
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
   logger.info('Connected to MongoDB');
   server = app.listen(config.port, () => {
@@ -11,6 +11,7 @@ mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
   });
 });
 
+// Graceful exit
 const exitHandler = () => {
   if (server) {
     server.close(() => {
@@ -22,6 +23,7 @@ const exitHandler = () => {
   }
 };
 
+// Handle errors
 const unexpectedErrorHandler = (error) => {
   logger.error(error);
   exitHandler();
@@ -29,7 +31,6 @@ const unexpectedErrorHandler = (error) => {
 
 process.on('uncaughtException', unexpectedErrorHandler);
 process.on('unhandledRejection', unexpectedErrorHandler);
-
 process.on('SIGTERM', () => {
   logger.info('SIGTERM received');
   if (server) {
