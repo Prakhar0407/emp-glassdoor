@@ -144,6 +144,51 @@ const replyToComment = catchAsync(async (req, res) => {
   res.send({ message: 'Reply to comment added successfully', review });
 });
 
+const likeReview = catchAsync(async (req, res) => {
+  const reviewId = req.params.id;
+  const userId = req.user.id;
+
+  const review = await Review.findById(reviewId);
+  if (!review) {
+    return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
+  }
+
+  const alreadyLiked = review.likes.includes(userId);
+  if (alreadyLiked) {
+    return res.status(httpStatus.BAD_REQUEST).send({ message: 'You already liked this review' });
+  }
+
+  review.likes.push(userId);
+  await review.save();
+
+  await review.populate('likes', 'name email');
+
+  res.send({
+    message: 'Review liked successfully',
+    totalLikes: review.likes.length,
+    likedBy: review.likes,
+  });
+});
+
+const unlikeReview = catchAsync(async (req, res) => {
+  const reviewId = req.params.id;
+  const userId = req.user.id;
+
+  const review = await Review.findById(reviewId);
+  if (!review) {
+    return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
+  }
+
+  review.likes = review.likes.filter((id) => id.toString() !== userId);
+
+  await review.save();
+
+  res.send({
+    message: 'Review unliked successfully',
+    totalLikes: review.likes.length,
+  });
+});
+
 module.exports = {
   createReview,
   getEmployeeReviews,
@@ -152,4 +197,6 @@ module.exports = {
   getReviewById,
   commentOnReview,
   replyToComment,
+  likeReview,
+  unlikeReview,
 };

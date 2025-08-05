@@ -10,4 +10,8 @@ router.post('/:id/reply', auth(), reviewController.replyReview);
 router.post('/:id/report', auth(), reviewController.reportReview);
 router.post('/:id/comment', auth(), reviewController.commentOnReview);
 router.post('/:reviewId/comments/:commentIndex/reply', auth(), reviewController.replyToComment);
+
+router.post('/:id/like', auth(), reviewController.likeReview);
+router.post('/:id/unlike', auth(), reviewController.unlikeReview);
+
 module.exports = router;

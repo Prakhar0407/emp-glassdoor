@@ -58,6 +58,12 @@ const reviewSchema = new mongoose.Schema(
       default: null,
     },
     comments: [commentSchema],
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
 
   { timestamps: true }
