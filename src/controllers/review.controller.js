@@ -114,6 +114,36 @@ const commentOnReview = catchAsync(async (req, res) => {
   res.send({ message: 'Comment added successfully', review });
 });
 
+const replyToComment = catchAsync(async (req, res) => {
+  const { reviewId, commentIndex } = req.params;
+  const { text } = req.body;
+
+  const review = await Review.findById(reviewId);
+  if (!review) {
+    return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
+  }
+
+  const comment = review.comments[commentIndex];
+  if (!comment) {
+    return res.status(httpStatus.NOT_FOUND).send({ message: 'Comment not found' });
+  }
+
+  comment.replies = comment.replies || [];
+
+  comment.replies.push({
+    user: req.user.id,
+    text,
+    createdAt: new Date(),
+  });
+
+  await review.save();
+
+  await review.populate('comments.user', 'name email');
+  await review.populate('comments.replies.user', 'name email');
+
+  res.send({ message: 'Reply to comment added successfully', review });
+});
+
 module.exports = {
   createReview,
   getEmployeeReviews,
@@ -121,4 +151,5 @@ module.exports = {
   reportReview,
   getReviewById,
   commentOnReview,
+  replyToComment,
 };

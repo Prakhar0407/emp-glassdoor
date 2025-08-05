@@ -1,6 +1,22 @@
 const mongoose = require('mongoose');
 const { toJSON, paginate } = require('./plugins');
 
+const replySchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    text: { type: String, required: true, trim: true },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { _id: false }
+);
+
 const commentSchema = new mongoose.Schema(
   {
     user: {
@@ -13,6 +29,7 @@ const commentSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    replies: [replySchema],
   },
   { _id: false } // optional: prevents auto-generating _id for each comment
 );

@@ -9,5 +9,5 @@ router.get('/:employeeId', auth(), reviewController.getEmployeeReviews);
 router.post('/:id/reply', auth(), reviewController.replyReview);
 router.post('/:id/report', auth(), reviewController.reportReview);
 router.post('/:id/comment', auth(), reviewController.commentOnReview);
-
+router.post('/:reviewId/comments/:commentIndex/reply', auth(), reviewController.replyToComment);
 module.exports = router;
