@@ -12,7 +12,7 @@ const Profile = () => {
 
       const data = await response.json();
       if (response.ok) {
-        console.log('Fetched User Data:', data.user);
+        // console.log('Fetched User Data:', data.user);
         setUser(data.user);
       }
     };

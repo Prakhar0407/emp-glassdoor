@@ -24,7 +24,12 @@ const createReview = catchAsync(async (req, res) => {
 
 const getEmployeeReviews = catchAsync(async (req, res) => {
   const { employeeId } = req.params;
-  const reviews = await Review.find({ employee: employeeId }).populate('employer', 'name email');
+  const reviews = await Review.find({ employee: employeeId })
+    .populate('employer', 'name email')
+    .populate('likes', 'name')
+    .populate('comments.user', 'name email')
+    .populate('reply.likes', 'name')
+    .populate('reply.comments.user', 'name email');
   res.send(reviews);
 });
 
@@ -40,7 +45,12 @@ const replyReview = catchAsync(async (req, res) => {
     return res.status(httpStatus.FORBIDDEN).send({ message: 'You can only reply to your own reviews' });
   }
 
-  review.reply = reply;
+  review.reply = {
+    text: reply,
+    createdAt: new Date(),
+    likes: [],
+    comments: [],
+  };
   await review.save();
 
   res.send({ message: 'Reply added successfully', review });
@@ -65,9 +75,50 @@ const reportReview = catchAsync(async (req, res) => {
   res.send({ message: 'Review reported successfully', review });
 });
 
+const getReviewById = catchAsync(async (req, res) => {
+  const review = await Review.findById(req.params.id)
+    .populate('employer', 'name email')
+    .populate('reviewLikes', 'name')
+    .populate('replyLikes', 'name')
+    .populate('reviewComments.user', 'name email')
+    .populate('replyComments.user', 'name email');
+
+  if (!review) {
+    return res.status(404).send({ message: 'Review not found' });
+  }
+
+  res.send(review);
+});
+
+const commentOnReview = catchAsync(async (req, res) => {
+  const { id: reviewId } = req.params;
+  const { text } = req.body;
+
+  const review = await Review.findById(reviewId);
+  if (!review) {
+    return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
+  }
+
+  const comment = {
+    user: req.user.id,
+    text,
+    createdAt: new Date(),
+  };
+
+  review.comments.push(comment);
+  await review.save();
+
+  // Optionally populate user data before sending response
+  await review.populate('comments.user', 'name email');
+
+  res.send({ message: 'Comment added successfully', review });
+});
+
 module.exports = {
   createReview,
   getEmployeeReviews,
   replyReview,
   reportReview,
+  getReviewById,
+  commentOnReview,
 };

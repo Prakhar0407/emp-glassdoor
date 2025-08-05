@@ -8,5 +8,6 @@ router.post('/:employeeId', auth('createReview'), reviewController.createReview)
 router.get('/:employeeId', auth(), reviewController.getEmployeeReviews);
 router.post('/:id/reply', auth(), reviewController.replyReview);
 router.post('/:id/report', auth(), reviewController.reportReview);
+router.post('/:id/comment', auth(), reviewController.commentOnReview);
 
 module.exports = router;

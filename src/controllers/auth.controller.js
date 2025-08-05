@@ -114,6 +114,33 @@ const getUserData = async (accessToken) => {
   return await response.json(); // Contains email, name, picture, etc.
 };
 
+// const getLinkedInLocation = catchAsync(async (req, res) => {
+//   const accessToken = req.headers.authorization?.replace('Bearer ', '');
+
+//   if (!accessToken) {
+//     return res.status(401).json({ success: false, message: 'Access token required' });
+//   }
+
+//   const country = 'urn:li:country:us';
+//   const placeCode = '1-1-0-23-30'; // You can get this dynamically from req.query or userData
+
+//   const response = await fetch(`https://api.linkedin.com/v2/places?q=placeCode&country=${country}&placeCode=${placeCode}`, {
+//     method: 'GET',
+//     headers: {
+//       Authorization: `Bearer ${accessToken}`,
+//       'X-Restli-Protocol-Version': '2.0.0',
+//     },
+//   });
+
+//   if (!response.ok) {
+//     const errorText = await response.text();
+//     return res.status(response.status).json({ success: false, message: errorText });
+//   }
+
+//   const locationData = await response.json();
+//   res.status(200).json({ success: true, location: locationData });
+// });
+
 const linkedInCallback = catchAsync(async (req, res) => {
   const { code } = req.query;
 
@@ -132,6 +159,7 @@ const linkedInCallback = catchAsync(async (req, res) => {
       email: userData.email,
       avatar: userData?.picture,
       phone: userData?.phone,
+      role: userData?.role,
       headline: userData?.headline,
 
       isEmailVerified: true,
@@ -139,10 +167,25 @@ const linkedInCallback = catchAsync(async (req, res) => {
     });
   }
 
-  const token = jwt.sign(
-    { id: user.id, name: user.name, email: user.email, avatar: user.avatar, headline: user.headline },
-    process.env.JWT_SECRET
-  );
+  // const token = jwt.sign(
+  //   { id: user.id, name: user.name, email: user.email, avatar: user.avatar, headline: user.headline },
+  //   process.env.JWT_SECRET
+  // );
+
+  const tokens = await tokenService.generateAuthTokens(user);
+
+  // Option 1: Send as JSON (e.g. for SPA frontend like React)
+  res.status(200).json({
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      headline: user.headline,
+      role: user.role,
+    },
+    tokens, // contains access + refresh
+  });
 
   res.cookie('token', token, { httpOnly: true });
   res.redirect('http://localhost:5173/profile');
@@ -171,4 +214,5 @@ module.exports = {
   loginEmployer,
   linkedInCallback,
   getUser,
+  // getLinkedInLocation,
 };
