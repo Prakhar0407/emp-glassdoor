@@ -57,6 +57,20 @@ const reviewSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    reportStatus: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected', null],
+      default: null,
+    },
+    reportedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+    isReported: {
+      type: Boolean,
+      default: false,
+    },
     comments: [commentSchema],
     likes: [
       {

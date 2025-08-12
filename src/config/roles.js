@@ -1,7 +1,7 @@
 const allRoles = {
   employee: ['viewOwnProfile', 'replyReview', 'reportReview'],
-  employer: ['createReview', 'createReview', 'viewEmployees'],
-  admin: ['getUsers', 'manageUsers', 'createReview', 'viewEmployees', 'manageReviews'],
+  employer: ['createReview', 'viewEmployees'],
+  admin: ['getUsers', 'manageUsers', 'createReview', 'viewEmployees', 'manageReviews', 'reportReview'],
 };
 
 const roles = Object.keys(allRoles);

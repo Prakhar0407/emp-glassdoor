@@ -45,34 +45,86 @@ const replyReview = catchAsync(async (req, res) => {
     return res.status(httpStatus.FORBIDDEN).send({ message: 'You can only reply to your own reviews' });
   }
 
-  review.reply = {
-    text: reply,
-    createdAt: new Date(),
-    likes: [],
-    comments: [],
-  };
+  // review.reply = {
+  //   text: reply,
+  //   createdAt: new Date(),
+  //   likes: [],
+  //   comments: [],
+  // };
+  review.reply = reply;
   await review.save();
 
   res.send({ message: 'Reply added successfully', review });
 });
 
 // Employee reports a review
+// const reportReview = catchAsync(async (req, res) => {
+//   const reviewId = req.params.id;
+//   const { reason } = req.body;
+
+//   const review = await Review.findById(reviewId);
+//   if (!review) return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
+
+//   if (review.employee.toString() !== req.user.id) {
+//     return res.status(httpStatus.FORBIDDEN).send({ message: 'You can only report reviews written about you' });
+//   }
+
+//   review.isReported = true;
+//   review.reportReason = reason;
+//   await review.save();
+
+//   res.send({ message: 'Review reported successfully', review });
+// });
+
 const reportReview = catchAsync(async (req, res) => {
   const reviewId = req.params.id;
   const { reason } = req.body;
 
   const review = await Review.findById(reviewId);
-  if (!review) return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
+  if (!review) {
+    return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
+  }
+  console.log('Review employee:', review.employee.toString());
+  console.log('Logged in user:', req.user.id);
 
   if (review.employee.toString() !== req.user.id) {
     return res.status(httpStatus.FORBIDDEN).send({ message: 'You can only report reviews written about you' });
   }
 
-  review.isReported = true;
+  review.reportStatus = 'pending';
   review.reportReason = reason;
+  review.reportedBy = req.user.id;
   await review.save();
 
-  res.send({ message: 'Review reported successfully', review });
+  res.send({ message: 'Review report submitted and is pending admin approval', review });
+});
+
+const approveReport = catchAsync(async (req, res) => {
+  const reviewId = req.params.id;
+  const { action } = req.body; // "approve" or "reject"
+
+  const review = await Review.findById(reviewId);
+  if (!review) {
+    return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
+  }
+
+  if (review.reportStatus !== 'pending') {
+    return res.status(httpStatus.BAD_REQUEST).send({ message: 'No pending report for this review' });
+  }
+
+  if (action === 'approve') {
+    review.reportStatus = 'approved';
+    review.isReported = true;
+  } else if (action === 'reject') {
+    review.reportStatus = 'rejected';
+    review.isReported = false;
+  } else {
+    return res.status(httpStatus.BAD_REQUEST).send({ message: 'Invalid action' });
+  }
+
+  await review.save();
+
+  res.send({ message: `Report ${action}d successfully`, review });
 });
 
 const getReviewById = catchAsync(async (req, res) => {
@@ -194,6 +246,7 @@ module.exports = {
   getEmployeeReviews,
   replyReview,
   reportReview,
+  approveReport,
   getReviewById,
   commentOnReview,
   replyToComment,
