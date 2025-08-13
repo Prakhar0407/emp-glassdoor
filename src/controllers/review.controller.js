@@ -241,6 +241,44 @@ const unlikeReview = catchAsync(async (req, res) => {
   });
 });
 
+const getEmployeeAverageRating = catchAsync(async (req, res) => {
+  const { employeeId } = req.params;
+
+  const employee = await User.findById(employeeId);
+  if (!employee || employee.role !== 'employee') {
+    return res.status(httpStatus.BAD_REQUEST).send({ message: 'Invalid employee ID' });
+  }
+
+  const result = await Review.aggregate([
+    { $match: { employee: employee._id } },
+    {
+      $group: {
+        _id: '$employee',
+        averageRating: { $avg: '$rating' },
+        totalReviews: { $sum: 1 },
+      },
+    },
+  ]);
+
+  if (result.length === 0) {
+    return res.send({
+      employeeId,
+      name: employee.name,
+      email: employee.email,
+      averageRating: 0,
+      totalReviews: 0,
+    });
+  }
+
+  res.send({
+    employeeId,
+    name: employee.name,
+    email: employee.email,
+    averageRating: Math.round(result[0].averageRating * 100) / 100, // round to 2 decimals
+    totalReviews: result[0].totalReviews,
+  });
+});
+
 const getEmployeesByAverageRating = catchAsync(async (req, res) => {
   const employees = await Review.aggregate([
     {
@@ -289,5 +327,6 @@ module.exports = {
   replyToComment,
   likeReview,
   unlikeReview,
+  getEmployeeAverageRating,
   getEmployeesByAverageRating,
 };

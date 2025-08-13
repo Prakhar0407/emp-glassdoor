@@ -19,6 +19,7 @@ router.post('/:reviewId/comments/:commentIndex/reply', auth(), reviewController.
 router.post('/:id/like', auth(), reviewController.likeReview);
 router.post('/:id/unlike', auth(), reviewController.unlikeReview);
 
+router.get('/employee/:employeeId/average-rating', reviewController.getEmployeeAverageRating);
 router.get('/employees/top-rated', reviewController.getEmployeesByAverageRating);
 
 module.exports = router;
