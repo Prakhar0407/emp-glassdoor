@@ -241,6 +241,43 @@ const unlikeReview = catchAsync(async (req, res) => {
   });
 });
 
+const getEmployeesByAverageRating = catchAsync(async (req, res) => {
+  const employees = await Review.aggregate([
+    {
+      $group: {
+        _id: '$employee', // Group by employee ID
+        averageRating: { $avg: '$rating' }, // Calculate average rating
+        totalReviews: { $sum: 1 }, // Count total reviews
+      },
+    },
+    {
+      $lookup: {
+        from: 'users', // User collection
+        localField: '_id',
+        foreignField: '_id',
+        as: 'employeeDetails',
+      },
+    },
+    { $unwind: '$employeeDetails' },
+    {
+      $match: { 'employeeDetails.role': 'employee' }, // Only employees
+    },
+    {
+      $project: {
+        _id: 0,
+        employeeId: '$_id',
+        name: '$employeeDetails.name',
+        email: '$employeeDetails.email',
+        averageRating: { $round: ['$averageRating', 2] }, // Round to 2 decimals
+        totalReviews: 1,
+      },
+    },
+    { $sort: { averageRating: -1 } }, // Descending order
+  ]);
+
+  res.send(employees);
+});
+
 module.exports = {
   createReview,
   getEmployeeReviews,
@@ -252,4 +289,5 @@ module.exports = {
   replyToComment,
   likeReview,
   unlikeReview,
+  getEmployeesByAverageRating,
 };
