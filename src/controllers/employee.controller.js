@@ -12,8 +12,7 @@ const getEmployeeProfile = catchAsync(async (req, res) => {
     return res.status(httpStatus.NOT_FOUND).send({ message: 'Employee not found' });
   }
 
-  const reviews = await Review.find({ employee: employeeId })
-    .populate('employer', 'name email');
+  const reviews = await Review.find({ employee: employeeId }).populate('employer', 'name email');
 
   res.send({
     id: employee.id,
@@ -24,7 +23,6 @@ const getEmployeeProfile = catchAsync(async (req, res) => {
     reviews,
   });
 });
-
 
 const viewEmployeeProfile = catchAsync(async (req, res) => {
   const employeeId = req.params.id;
@@ -74,8 +72,46 @@ const searchEmployees = catchAsync(async (req, res) => {
   res.send(employees);
 });
 
+const updateEmployeeProfileDetails = catchAsync(async (req, res) => {
+  const employeeId = req.params.id;
+  const { skills, workHistory, resume } = req.body;
+
+  const employee = await User.findById(employeeId);
+  if (!employee || employee.role !== 'employee') {
+    return res.status(httpStatus.NOT_FOUND).send({ message: 'Employee not found' });
+  }
+
+  if (skills) {
+    if (!Array.isArray(skills)) {
+      return res.status(httpStatus.BAD_REQUEST).send({ message: 'Skills must be an array' });
+    }
+    employee.skills = skills.map((s) => s.trim().toLowerCase());
+  }
+
+  if (workHistory) {
+    if (!Array.isArray(workHistory)) {
+      return res.status(httpStatus.BAD_REQUEST).send({ message: 'Work history must be an array' });
+    }
+    employee.workHistory = workHistory;
+  }
+
+  if (resume) {
+    employee.resume = resume; // You can store a URL or file path here
+  }
+
+  await employee.save();
+
+  res.send({
+    message: 'Employee profile updated successfully',
+    skills: employee.skills,
+    workHistory: employee.workHistory,
+    resume: employee.resume || null,
+  });
+});
+
 module.exports = {
   getEmployeeProfile,
   viewEmployeeProfile,
   searchEmployees,
+  updateEmployeeProfileDetails,
 };

@@ -62,7 +62,27 @@ const userSchema = mongoose.Schema(
       unique: true,
       sparse: true,
     },
+    skills: {
+      type: [String],
+      default: [],
+    },
+    workHistory: {
+      type: [
+        {
+          company: String,
+          role: String,
+          startDate: Date,
+          endDate: Date,
+          description: String,
+        },
+      ],
+      default: [],
+    },
+    resume: {
+      type: String, // store resume file URL or base64 string
+    },
   },
+
   {
     timestamps: true,
   }
