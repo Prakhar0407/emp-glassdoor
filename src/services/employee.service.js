@@ -1,0 +1,69 @@
+const { User } = require('../models');
+const Review = require('../models/review.model');
+const ViewLog = require('../models/viewLog.model');
+
+const getEmployeeProfile = async (employeeId) => {
+  const employee = await User.findById(employeeId).select('-password');
+  if (!employee || employee.role !== 'employee') return null;
+
+  const reviews = await Review.find({ employee: employeeId }).populate('employer', 'name email');
+
+  return {
+    id: employee.id,
+    name: employee.name,
+    email: employee.email,
+    skills: employee.skills || [],
+    profileViews: employee.profileViews || 0,
+    reviews,
+  };
+};
+
+const incrementProfileView = async (employeeId, viewerId) => {
+  const employee = await User.findById(employeeId);
+  if (!employee || employee.role !== 'employee') return null;
+
+  employee.profileViews = (employee.profileViews || 0) + 1;
+  await employee.save();
+
+  await ViewLog.create({ employee: employeeId, viewer: viewerId });
+  return employee;
+};
+
+const searchEmployees = async (query) => {
+  const { skills, name, email } = query;
+  const filter = { role: 'employee' };
+
+  if (skills) {
+    const skillsArray = skills.split(',').map((s) => s.trim().toLowerCase());
+    filter.skills = { $in: skillsArray };
+  }
+  if (name) filter.name = { $regex: name, $options: 'i' };
+  if (email) filter.email = { $regex: email, $options: 'i' };
+
+  return User.find(filter).select('-password -__v');
+};
+
+const updateEmployeeProfile = async (employeeId, { skills, workHistory, resume }) => {
+  const employee = await User.findById(employeeId);
+  if (!employee || employee.role !== 'employee') return null;
+
+  if (skills) {
+    if (!Array.isArray(skills)) throw new Error('Skills must be an array');
+    employee.skills = skills.map((s) => s.trim().toLowerCase());
+  }
+  if (workHistory) {
+    if (!Array.isArray(workHistory)) throw new Error('Work history must be an array');
+    employee.workHistory = workHistory;
+  }
+  if (resume) employee.resume = resume;
+
+  await employee.save();
+  return employee;
+};
+
+module.exports = {
+  getEmployeeProfile,
+  incrementProfileView,
+  searchEmployees,
+  updateEmployeeProfile,
+};
