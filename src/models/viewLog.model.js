@@ -23,4 +23,4 @@ const viewLogSchema = mongoose.Schema(
 );
 
 const ViewLog = mongoose.model('ViewLog', viewLogSchema);
-module.exports = ViewLog; 
+module.exports = ViewLog;
