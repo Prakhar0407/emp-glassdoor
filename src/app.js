@@ -9,7 +9,6 @@ const httpStatus = require('http-status');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 
-// 👇 ADD these
 require('./config/passport'); // this should include your LinkedIn strategy
 
 const app = express();

@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const reviewService = require('../services/review.service');
+const notificationService = require('../services/notification.service');
 
 const createReview = catchAsync(async (req, res) => {
   const review = await reviewService.createReview(req.user.id, req.params.employeeId, req.body);
@@ -55,10 +56,24 @@ const replyToComment = catchAsync(async (req, res) => {
 
 const likeReview = catchAsync(async (req, res) => {
   const review = await reviewService.likeReview(req.params.id, req.user.id);
-  if (!review) return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
-  res.send({ message: 'Review liked successfully', totalLikes: review.likes.length, likedBy: review.likes });
-});
 
+  if (!review) {
+    return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
+  }
+
+//notification to employer
+  await notificationService.createNotification(
+    req.user.id, // employerId
+    'like',
+    `You liked a review with ID ${req.params.id}` // message
+  );
+
+  res.send({
+    message: 'Review liked successfully',
+    totalLikes: review.likes.length,
+    likedBy: review.likes,
+  });
+});
 const unlikeReview = catchAsync(async (req, res) => {
   const review = await reviewService.unlikeReview(req.params.id, req.user.id);
   if (!review) return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });

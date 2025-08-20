@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const app = require('./app'); // ✅ app has LinkedIn already configured
+const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
 

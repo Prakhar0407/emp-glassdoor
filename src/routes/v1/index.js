@@ -7,6 +7,7 @@ const linkedinRoute = require('./linkedin.route');
 const employeeRoute = require('./employee.route');
 const employerRoute = require('./employer.route');
 const adminRoute = require('./admin.route');
+const notificationRoute = require('./notification.route');
 
 const config = require('../../config/config');
 
@@ -45,6 +46,10 @@ const defaultRoutes = [
     path: '/linkedin',
     route: linkedinRoute,
   },
+  {
+    path: '/notifications',
+    route: notificationRoute,
+  },
 ];
 
 const devRoutes = [
@@ -59,7 +64,6 @@ defaultRoutes.forEach((route) => {
   router.use(route.path, route.route);
 });
 
-/* istanbul ignore next */
 if (config.env === 'development') {
   devRoutes.forEach((route) => {
     router.use(route.path, route.route);
