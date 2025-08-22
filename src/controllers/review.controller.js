@@ -5,6 +5,21 @@ const notificationService = require('../services/notification.service');
 
 const createReview = catchAsync(async (req, res) => {
   const review = await reviewService.createReview(req.user.id, req.params.employeeId, req.body);
+
+  // notification for employee
+  await Notification.create({
+    employeeId: req.params.employeeId,
+    type: 'review',
+    message: `A new review was added for you by employer with ID ${req.user.id}`,
+  });
+
+  // notification for the employer
+  await Notification.create({
+    employerId: req.user.id,
+    type: 'review',
+    message: `You wrote a review for employee with ID ${req.params.employeeId}`,
+  });
+
   res.status(httpStatus.CREATED).send(review);
 });
 
@@ -56,16 +71,22 @@ const replyToComment = catchAsync(async (req, res) => {
 
 const likeReview = catchAsync(async (req, res) => {
   const review = await reviewService.likeReview(req.params.id, req.user.id);
-
   if (!review) {
     return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
   }
 
-//notification to employer
+  //notification to employer
   await notificationService.createNotification(
     req.user.id, // employerId
     'like',
     `You liked a review with ID ${req.params.id}` // message
+  );
+
+  //notification to employee
+  await notificationService.createNotification(
+    review.employee, // employeeId
+    'like',
+    `Employer ${req.user.name || req.user.id} liked your review`
   );
 
   res.send({
@@ -74,6 +95,7 @@ const likeReview = catchAsync(async (req, res) => {
     likedBy: review.likes,
   });
 });
+
 const unlikeReview = catchAsync(async (req, res) => {
   const review = await reviewService.unlikeReview(req.params.id, req.user.id);
   if (!review) return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
