@@ -74,6 +74,17 @@ const loginEmployer = catchAsync(async (req, res) => {
   res.send({ user, tokens });
 });
 
+const logoutEmployee = catchAsync(async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (refreshToken) {
+    await authService.logout(refreshToken);
+  }
+  res.clearCookie('token');
+
+  res.status(httpStatus.OK).send({ message: 'Employee logout successful' });
+});
+
 // LinkedIn login helpers
 const getAccessToken = async (code) => {
   const body = new URLSearchParams({
@@ -183,6 +194,7 @@ module.exports = {
   verifyEmail,
   registerEmployer,
   loginEmployer,
+  logoutEmployee,
   linkedInCallback,
   getUser,
 };
