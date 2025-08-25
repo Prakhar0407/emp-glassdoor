@@ -130,7 +130,7 @@ const config = require('../config/config');
 const userService = require('./user.service');
 const { Token } = require('../models');
 const ApiError = require('../utils/ApiError');
-const { tokenTypes } = require('../config/tokens');
+const { TOKEN_EXPIRY, tokenTypes } = require('../config/tokens');
 
 /**
  * Generate token
@@ -191,11 +191,12 @@ const verifyToken = async (token, type) => {
  * @param {User} user
  * @returns {Promise<Object>}
  */
-const generateAuthTokens = async (user) => {
-  const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes');
+const generateAuthTokens = async (user, rememberMe = false) => {
+  const accessTokenExpires = moment().add(TOKEN_EXPIRY.ACCESS.DEFAULT, 'minutes');
   const accessToken = generateToken(user, accessTokenExpires, tokenTypes.ACCESS);
 
-  const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, 'days');
+  const refreshExpiryDays = rememberMe ? TOKEN_EXPIRY.REFRESH.REMEMBER_ME : TOKEN_EXPIRY.REFRESH.DEFAULT;
+  const refreshTokenExpires = moment().add(refreshExpiryDays, 'days');
   const refreshToken = generateToken(user, refreshTokenExpires, tokenTypes.REFRESH);
   await saveToken(refreshToken, user.id, refreshTokenExpires, tokenTypes.REFRESH);
 

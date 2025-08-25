@@ -8,8 +8,8 @@ const register = catchAsync(async (req, res) => {
 });
 
 const login = catchAsync(async (req, res) => {
-  const { email, password } = req.body;
-  const { user, tokens } = await employerService.loginEmployer(email, password);
+  const { email, password, rememberMe } = req.body;
+  const { user, tokens } = await employerService.loginEmployer(email, password, rememberMe);
   res.send({ user, tokens });
 });
 

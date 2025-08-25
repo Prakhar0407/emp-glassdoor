@@ -9,14 +9,14 @@ const registerEmployer = async (userBody) => {
   return { user, tokens };
 };
 
-const loginEmployer = async (email, password) => {
+const loginEmployer = async (email, password, rememberMe = false) => {
   const user = await authService.loginUserWithEmailAndPassword(email, password);
 
   if (user.role !== 'employer') {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Access denied: Not an employer');
   }
 
-  const tokens = await tokenService.generateAuthTokens(user);
+  const tokens = await tokenService.generateAuthTokens(user, rememberMe);
   return { user, tokens };
 };
 
