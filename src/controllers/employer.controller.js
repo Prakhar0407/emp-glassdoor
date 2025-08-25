@@ -13,7 +13,13 @@ const login = catchAsync(async (req, res) => {
   res.send({ user, tokens });
 });
 
+const logout = catchAsync(async (req, res) => {
+  await employerService.logoutEmployer(req.body.refreshToken);
+  res.status(httpStatus.OK).send({ message: 'Logout successful' });
+});
+
 module.exports = {
   register,
   login,
+  logout,
 };

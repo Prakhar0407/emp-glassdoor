@@ -7,5 +7,6 @@ const router = express.Router();
 
 router.post('/register', validate(authValidation.register), employerController.register);
 router.post('/login', validate(authValidation.login), employerController.login);
+router.post('/logout', validate(authValidation.logout), employerController.logout);
 
 module.exports = router;

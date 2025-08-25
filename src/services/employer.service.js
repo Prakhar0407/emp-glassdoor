@@ -20,7 +20,12 @@ const loginEmployer = async (email, password) => {
   return { user, tokens };
 };
 
+const logoutEmployer = async (refreshToken) => {
+  await authService.logout(refreshToken);
+};
+
 module.exports = {
   registerEmployer,
   loginEmployer,
+  logoutEmployer,
 };
