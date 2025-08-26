@@ -45,7 +45,7 @@ const sendVerificationEmail = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
-const verifyEmail = catchAsync(async (req, res) => {
+const verifyEmail = catchAsync(async (req, res, next) => {
   await authService.verifyEmail(req.query.token);
   res.status(httpStatus.NO_CONTENT).send();
 });
@@ -158,6 +158,7 @@ const linkedInCallback = catchAsync(async (req, res) => {
   const tokens = await tokenService.generateAuthTokens(user);
 
   res.status(200).json({
+    success: true,
     user: {
       id: user.id,
       name: user.name,

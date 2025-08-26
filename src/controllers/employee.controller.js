@@ -34,7 +34,13 @@ const updateEmployeeProfileDetails = catchAsync(async (req, res) => {
     }
     res.send({
       message: 'Employee profile updated successfully',
-      skills: employee.skills,
+      employmentStatus: employee.employmentStatus,
+      jobTitle: employee.jobTitle,
+      employer: employee.employer,
+      location: employee.location,
+      primaryIndustry: employee.primaryIndustry,
+      specialization: employee.specialization,
+      skills: employee.skills || [],
       workHistory: employee.workHistory,
       resume: employee.resume || null,
     });

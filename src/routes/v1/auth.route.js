@@ -14,20 +14,12 @@ router.post('/refresh-tokens', validate(authValidation.refreshTokens), authContr
 router.post('/forgot-password', validate(authValidation.forgotPassword), authController.forgotPassword);
 router.post('/reset-password', validate(authValidation.resetPassword), authController.resetPassword);
 router.post('/send-verification-email', auth(), authController.sendVerificationEmail);
-router.post('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
-
-// Employer Auth
-router.post('/employer/register', validate(authValidation.register), authController.registerEmployer);
-router.post('/employer/login', validate(authValidation.login), authController.loginEmployer);
+router.get('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
 
 // LinkedIn OAuth
 
 router.get('/callback', authController.linkedInCallback);
 router.get('/get-user', authController.getUser);
-
-// router.get('/linkedin', (req, res) => {
-//   res.send('LinkedIn route working');
-// });
 
 module.exports = router;
 

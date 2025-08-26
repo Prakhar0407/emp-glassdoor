@@ -43,10 +43,19 @@ const searchEmployees = async (query) => {
   return User.find(filter).select('-password -__v');
 };
 
-const updateEmployeeProfile = async (employeeId, { skills, workHistory, resume }) => {
+const updateEmployeeProfile = async (
+  employeeId,
+  { employmentStatus, jobTitle, employer, location, primaryIndustry, specialization, skills, workHistory, resume }
+) => {
   const employee = await User.findById(employeeId);
   if (!employee || employee.role !== 'employee') return null;
 
+  if (employmentStatus) employee.employmentStatus = employmentStatus.trim();
+  if (jobTitle) employee.jobTitle = jobTitle.trim();
+  if (employer) employee.employer = employer.trim();
+  if (location) employee.location = location.trim();
+  if (primaryIndustry) employee.primaryIndustry = primaryIndustry.trim();
+  if (specialization) employee.specialization = specialization.trim();
   if (skills) {
     if (!Array.isArray(skills)) throw new Error('Skills must be an array');
     employee.skills = skills.map((s) => s.trim().toLowerCase());
@@ -56,7 +65,6 @@ const updateEmployeeProfile = async (employeeId, { skills, workHistory, resume }
     employee.workHistory = workHistory;
   }
   if (resume) employee.resume = resume;
-
   await employee.save();
   return employee;
 };

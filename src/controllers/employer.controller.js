@@ -3,8 +3,8 @@ const catchAsync = require('../utils/catchAsync');
 const employerService = require('../services/employer.service');
 
 const register = catchAsync(async (req, res) => {
-  const { user, tokens } = await employerService.registerEmployer(req.body);
-  res.status(httpStatus.CREATED).send({ user, tokens });
+  const result = await employerService.registerEmployer(req.body);
+  res.status(httpStatus.CREATED).json(result);
 });
 
 const login = catchAsync(async (req, res) => {

@@ -52,8 +52,9 @@ module.exports = {
   },
   email: {
     smtp: {
-      host: envVars.SMTP_HOST,
-      port: envVars.SMTP_PORT,
+      host: envVars.SMTP_HOST, // smtp.gmail.com
+      port: Number(envVars.SMTP_PORT), // 587
+      secure: false, // 465 ke liye true, 587 ke liye false
       auth: {
         user: envVars.SMTP_USERNAME,
         pass: envVars.SMTP_PASSWORD,
@@ -67,5 +68,4 @@ module.exports = {
     clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
     callbackURL: process.env.LINKEDIN_CALLBACK_URL,
   },
-  
 };

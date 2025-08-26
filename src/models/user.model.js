@@ -62,24 +62,34 @@ const userSchema = mongoose.Schema(
       unique: true,
       sparse: true,
     },
+    // skills: {
+    //   type: [String],
+    //   default: [],
+    // },
+    // workHistory: {
+    //   type: [
+    //     {
+    //       company: String,
+    //       role: String,
+    //       startDate: Date,
+    //       endDate: Date,
+    //       description: String,
+    //     },
+    //   ],
+    //   default: [],
+    // },
+    // resume: {
+    //   type: String, // store resume file URL or base64 string
+    // },
+    employmentStatus: { type: String, default: '' },
+    jobTitle: { type: String, default: '' },
+    employer: { type: String, default: '' },
+    location: { type: String, default: '' },
+    primaryIndustry: { type: String, default: '' },
+    specialization: { type: String, default: '' },
     skills: {
       type: [String],
       default: [],
-    },
-    workHistory: {
-      type: [
-        {
-          company: String,
-          role: String,
-          startDate: Date,
-          endDate: Date,
-          description: String,
-        },
-      ],
-      default: [],
-    },
-    resume: {
-      type: String, // store resume file URL or base64 string
     },
   },
 
