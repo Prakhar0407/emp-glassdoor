@@ -46,6 +46,22 @@ const approveReport = catchAsync(async (req, res) => {
   res.send({ message: `Report ${req.body.action}d successfully`, review });
 });
 
+const deleteReview = catchAsync(async (req, res) => {
+  const { reason } = req.body;
+
+  if (!reason || reason.trim().length === 0) {
+    return res.status(httpStatus.BAD_REQUEST).send({ message: 'Delete reason is required' });
+  }
+
+  const result = await reviewService.deleteReview(req.params.id, req.user.id, reason);
+
+  if (!result) {
+    return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
+  }
+
+  res.send(result);
+});
+
 const getReviewById = catchAsync(async (req, res) => {
   const review = await reviewService.getReviewById(req.params.id);
   if (!review) return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
@@ -118,6 +134,7 @@ module.exports = {
   replyReview,
   reportReview,
   approveReport,
+  deleteReview,
   getReviewById,
   commentOnReview,
   replyToComment,

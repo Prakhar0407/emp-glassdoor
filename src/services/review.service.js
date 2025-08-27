@@ -93,6 +93,20 @@ const approveReport = async (reviewId, action) => {
   return review;
 };
 
+const deleteReview = async (reviewId, userId, reason) => {
+  const review = await Review.findById(reviewId);
+  if (!review) return null;
+  if (review.employee.toString() !== userId) {
+    const err = new Error('You can only delete reviews written about you');
+    err.statusCode = 403;
+    throw err;
+  }
+  review.deleteReason = reason;
+  review.deletedAt = new Date();
+  await review.remove();
+  return { message: 'Review deleted successfully', reviewId, reason };
+};
+
 const getReviewById = async (id) => {
   return Review.findById(id)
     .populate('employer', 'name email')
@@ -226,6 +240,7 @@ module.exports = {
   replyReview,
   reportReview,
   approveReport,
+  deleteReview,
   getReviewById,
   commentOnReview,
   replyToComment,

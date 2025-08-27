@@ -8,6 +8,8 @@ router.post('/:employeeId', auth('createReview'), reviewController.createReview)
 router.get('/:employeeId', auth(), reviewController.getEmployeeReviews);
 router.post('/:id/reply', auth(), reviewController.replyReview);
 
+router.delete('/:id', auth(), reviewController.deleteReview);
+
 // router.post('/:id/report', auth(), reviewController.reportReview);
 
 router.post('/:id/report', auth('reportReview'), reportReview);
