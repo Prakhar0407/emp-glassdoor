@@ -18,8 +18,24 @@ const logout = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send({ message: 'Logout successful' });
 });
 
+const updateCompanyDetails = catchAsync(async (req, res) => {
+  const employerId = req.user.id; // assuming req.user populated via auth middleware
+  const companyData = req.body;
+
+  const company = await employerService.updateCompanyDetails(employerId, companyData);
+  res.status(httpStatus.OK).json({ company, message: 'Company details saved successfully' });
+});
+
+const getCompanyDetails = catchAsync(async (req, res) => {
+  const employerId = req.user.id;
+  const company = await employerService.getCompanyDetails(employerId);
+  res.status(httpStatus.OK).json(company);
+});
+
 module.exports = {
   register,
   login,
   logout,
+  updateCompanyDetails,
+  getCompanyDetails,
 };
