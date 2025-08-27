@@ -1,16 +1,17 @@
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
 const { authService, userService, tokenService, emailService } = require('.');
+const { isOfficialEmail } = require('../utils/validateEmail');
 
 const registerEmployer = async (userBody) => {
+  if (!isOfficialEmail(userBody.email)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Please use your official company email ID.');
+  }
+
   const employerData = { ...userBody, role: 'employer', isEmailVerified: false };
   const user = await userService.createUser(employerData);
 
   const verificationToken = await tokenService.generateVerifyEmailToken(user);
-
-  // const tokens = await tokenService.generateAuthTokens(user);
-  // return { user, tokens };
-
   await emailService.sendVerificationEmail(user.email, verificationToken);
 
   return { message: 'Registration successful. Please verify your email.' };
