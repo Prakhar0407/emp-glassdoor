@@ -10,6 +10,13 @@ const createReview = async (employerId, employeeId, body) => {
     throw err;
   }
 
+  const wordCount = body.comment ? body.comment.trim().split(/\s+/).length : 0;
+  if (wordCount < 100) {
+    const err = new Error('Review comment must be at least 100 words');
+    err.statusCode = httpStatus.BAD_REQUEST;
+    throw err;
+  }
+
   return Review.create({
     employee: employeeId,
     employer: employerId,
