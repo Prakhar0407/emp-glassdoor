@@ -5,24 +5,6 @@ const { authService, userService, tokenService, emailService } = require('../ser
 const User = require('../models/user.model');
 const fetch = require('node-fetch');
 
-const register = catchAsync(async (req, res) => {
-  const user = await userService.createUser(req.body);
-  const tokens = await tokenService.generateAuthTokens(user);
-  res.status(httpStatus.CREATED).send({ user, tokens });
-});
-
-const login = catchAsync(async (req, res) => {
-  const { email, password } = req.body;
-  const user = await authService.loginUserWithEmailAndPassword(email, password);
-  const tokens = await tokenService.generateAuthTokens(user);
-  res.send({ user, tokens });
-});
-
-const logout = catchAsync(async (req, res) => {
-  await authService.logout(req.body.refreshToken);
-  res.status(httpStatus.NO_CONTENT).send();
-});
-
 const refreshTokens = catchAsync(async (req, res) => {
   const tokens = await authService.refreshAuth(req.body.refreshToken);
   res.send({ ...tokens });
@@ -31,12 +13,14 @@ const refreshTokens = catchAsync(async (req, res) => {
 const forgotPassword = catchAsync(async (req, res) => {
   const resetPasswordToken = await tokenService.generateResetPasswordToken(req.body.email);
   await emailService.sendResetPasswordEmail(req.body.email, resetPasswordToken);
-  res.status(httpStatus.NO_CONTENT).send();
+  res.status(httpStatus.OK).send({
+    message: 'Reset password link has been sent to your email',
+  });
 });
 
 const resetPassword = catchAsync(async (req, res) => {
   await authService.resetPassword(req.query.token, req.body.password);
-  res.status(httpStatus.NO_CONTENT).send();
+  res.status(200).send({ message: 'Reset password successfully' });
 });
 
 const sendVerificationEmail = catchAsync(async (req, res) => {
@@ -48,30 +32,6 @@ const sendVerificationEmail = catchAsync(async (req, res) => {
 const verifyEmail = catchAsync(async (req, res, next) => {
   await authService.verifyEmail(req.query.token);
   res.status(httpStatus.NO_CONTENT).send();
-});
-
-const registerEmployer = catchAsync(async (req, res) => {
-  const userBody = {
-    ...req.body,
-    role: 'employer',
-    isEmailVerified: true,
-  };
-
-  const user = await userService.createUser(userBody);
-  const tokens = await tokenService.generateAuthTokens(user);
-  res.status(httpStatus.CREATED).send({ user, tokens });
-});
-
-const loginEmployer = catchAsync(async (req, res) => {
-  const { email, password } = req.body;
-  const user = await authService.loginUserWithEmailAndPassword(email, password);
-
-  if (user.role !== 'employer') {
-    return res.status(httpStatus.UNAUTHORIZED).send({ message: 'Not authorized as employer' });
-  }
-
-  const tokens = await tokenService.generateAuthTokens(user);
-  res.send({ user, tokens });
 });
 
 const logoutEmployee = catchAsync(async (req, res) => {
@@ -185,16 +145,11 @@ const getUser = catchAsync(async (req, res) => {
 });
 
 module.exports = {
-  register,
-  login,
-  logout,
   refreshTokens,
   forgotPassword,
   resetPassword,
   sendVerificationEmail,
   verifyEmail,
-  registerEmployer,
-  loginEmployer,
   logoutEmployee,
   linkedInCallback,
   getUser,
