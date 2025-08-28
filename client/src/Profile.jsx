@@ -12,7 +12,6 @@ const Profile = () => {
 
       const data = await response.json();
       if (response.ok) {
-        // console.log('Fetched User Data:', data.user);
         setUser(data.user);
       }
     };
@@ -28,8 +27,6 @@ const Profile = () => {
       <p>
         Avatar: <img src={user?.avatar} />
       </p>
-      {/* <p>phone: {user?.phone}</p>
-      <p>Company: {user?.company}</p> */}
     </div>
   );
 };

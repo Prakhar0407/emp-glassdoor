@@ -105,17 +105,15 @@ const linkedInCallback = catchAsync(async (req, res) => {
       phone: userData?.phone,
       role: userData?.role,
       headline: userData?.headline,
-
       isEmailVerified: true,
     });
   }
 
-  // const token = jwt.sign(
-  //   { id: user.id, name: user.name, email: user.email, avatar: user.avatar, headline: user.headline },
-  //   process.env.JWT_SECRET
-  // );
+  const rememberMe = req.cookies.rememberMe === 'true';
 
-  const tokens = await tokenService.generateAuthTokens(user);
+  const tokens = await tokenService.generateAuthTokens(user, rememberMe);
+
+  res.clearCookie('rememberMe');
 
   res.status(200).json({
     success: true,
@@ -129,9 +127,6 @@ const linkedInCallback = catchAsync(async (req, res) => {
     },
     tokens, // contains access + refresh
   });
-
-  res.cookie('token', token, { httpOnly: true });
-  res.redirect('http://localhost:5173/profile');
 });
 
 const getUser = catchAsync(async (req, res) => {
