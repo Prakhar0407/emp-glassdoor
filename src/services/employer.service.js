@@ -5,12 +5,20 @@ const Company = require('../models/company.model');
 const { isOfficialEmail } = require('../utils/validateEmail');
 
 const registerEmployer = async (userBody) => {
-  if (!isOfficialEmail(userBody.email)) {
+  const { email, companyName, website, password } = userBody;
+
+  if (!email || !companyName || !website || !password) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'All fields are required');
+  }
+
+  if (!isOfficialEmail(email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Please use your official company email ID.');
   }
 
-  const employerData = { ...userBody, role: 'employer', isEmailVerified: false };
+  const employerData = { email, password, role: 'employer', isEmailVerified: false };
   const user = await userService.createUser(employerData);
+
+  await Company.create({ companyName, website, employer: user._id });
 
   const verificationToken = await tokenService.generateVerifyEmailToken(user);
   await emailService.sendVerificationEmail(user.email, verificationToken);

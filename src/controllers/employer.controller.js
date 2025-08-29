@@ -19,7 +19,7 @@ const logout = catchAsync(async (req, res) => {
 });
 
 const updateCompanyDetails = catchAsync(async (req, res) => {
-  const employerId = req.user.id; // assuming req.user populated via auth middleware
+  const employerId = req.user.id;
   const companyData = req.body;
 
   const company = await employerService.updateCompanyDetails(employerId, companyData);

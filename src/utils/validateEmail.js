@@ -1,4 +1,4 @@
-const blockedDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'protonmail.com', 'rediffmail.com'];
+const blockedDomains = [ 'yahoo.com', 'outlook.com', 'hotmail.com', 'protonmail.com', 'rediffmail.com'];
 
 function isOfficialEmail(email) {
   if (!email || !email.includes('@')) return false;

@@ -8,7 +8,7 @@ const userSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     email: {
@@ -44,6 +44,7 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company' },
     profileViews: {
       type: Number,
       default: 0,
