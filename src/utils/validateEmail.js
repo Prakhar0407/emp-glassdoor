@@ -1,14 +1,29 @@
-const blockedDomains = [ 'yahoo.com', 'outlook.com', 'hotmail.com', 'protonmail.com', 'rediffmail.com'];
+const blockedDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'protonmail.com', 'rediffmail.com'];
 
-function isOfficialEmail(email) {
-  if (!email || !email.includes('@')) return false;
-  const domain = email.split('@')[1].toLowerCase();
+function normalizeDomain(url) {
+  return url
+    .replace(/^https?:\/\//, '')
+    .replace(/^www\./, '')
+    .split('/')[0]
+    .toLowerCase();
+}
+
+function isOfficialEmail(email, website) {
+  if (!email || !email.includes('@') || !website) return false;
+
+  const emailDomain = email.split('@')[1].toLowerCase();
+  const siteDomain = normalizeDomain(website);
 
   // block personal domains
-  if (blockedDomains.includes(domain)) return false;
+  if (blockedDomains.includes(emailDomain)) return false;
 
   // block academic domains
-  if (domain.endsWith('.ac.in') || domain.endsWith('.edu') || domain.endsWith('.edu.in')) {
+  if (emailDomain.endsWith('.ac.in') || emailDomain.endsWith('.edu') || emailDomain.endsWith('.edu.in')) {
+    return false;
+  }
+
+  // email domain matches or contains website domain
+  if (!(emailDomain === siteDomain || emailDomain.endsWith('.' + siteDomain))) {
     return false;
   }
 

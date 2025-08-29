@@ -11,7 +11,7 @@ const registerEmployer = async (userBody) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'All fields are required');
   }
 
-  if (!isOfficialEmail(email)) {
+  if (!isOfficialEmail(email, website)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Please use your official company email ID.');
   }
 
