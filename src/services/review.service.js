@@ -27,7 +27,7 @@ const createReview = async (employerId, employeeId, body) => {
 };
 
 const getEmployeeReviews = async (employeeId) => {
-  return Review.find({ employee: employeeId })
+  return Review.find({ employee: employeeId, deleted: false })
     .populate('employer', 'name email')
     .populate('likes', 'name')
     .populate('comments.user', 'name email')
@@ -36,7 +36,7 @@ const getEmployeeReviews = async (employeeId) => {
 };
 
 const replyReview = async (reviewId, userId, reply) => {
-  const review = await Review.findById(reviewId);
+  const review = await Review.findOne({ _id: reviewId, deleted: false });
   if (!review) return null;
 
   if (review.employee.toString() !== userId) {
@@ -51,7 +51,7 @@ const replyReview = async (reviewId, userId, reply) => {
 };
 
 const reportReview = async (reviewId, userId, reason) => {
-  const review = await Review.findById(reviewId);
+  const review = await Review.findOne({ _id: reviewId, deleted: false });
   if (!review) return null;
 
   if (review.employee.toString() !== userId) {
@@ -68,7 +68,7 @@ const reportReview = async (reviewId, userId, reason) => {
 };
 
 const approveReport = async (reviewId, action) => {
-  const review = await Review.findById(reviewId);
+  const review = await Review.findOne({ _id: reviewId, deleted: false });
   if (!review) return null;
 
   if (review.reportStatus !== 'pending') {
@@ -94,21 +94,24 @@ const approveReport = async (reviewId, action) => {
 };
 
 const deleteReview = async (reviewId, userId, reason) => {
-  const review = await Review.findById(reviewId);
+  const review = await Review.findOne({ _id: reviewId, deleted: false });
   if (!review) return null;
   if (review.employee.toString() !== userId) {
     const err = new Error('You can only delete reviews written about you');
     err.statusCode = 403;
     throw err;
   }
+  review.deleted = true;
   review.deleteReason = reason;
   review.deletedAt = new Date();
-  await review.remove();
+  review.deletedBy = userId;
+
+  await review.save();
   return { message: 'Review deleted successfully', reviewId, reason };
 };
 
 const getReviewById = async (id) => {
-  return Review.findById(id)
+  return Review.findOne({ _id: id, deleted: false })
     .populate('employer', 'name email')
     .populate('reviewLikes', 'name')
     .populate('replyLikes', 'name')
@@ -117,7 +120,7 @@ const getReviewById = async (id) => {
 };
 
 const commentOnReview = async (reviewId, userId, text) => {
-  const review = await Review.findById(reviewId);
+  const review = await Review.findOne({ _id: reviewId, deleted: false });
   if (!review) return null;
 
   const comment = { user: userId, text, createdAt: new Date() };
@@ -129,7 +132,7 @@ const commentOnReview = async (reviewId, userId, text) => {
 };
 
 const replyToComment = async (reviewId, commentIndex, userId, text) => {
-  const review = await Review.findById(reviewId);
+  const review = await Review.findOne({ _id: reviewId, deleted: false });
   if (!review) return null;
 
   const comment = review.comments[commentIndex];
@@ -145,7 +148,7 @@ const replyToComment = async (reviewId, commentIndex, userId, text) => {
 };
 
 const likeReview = async (reviewId, userId) => {
-  const review = await Review.findById(reviewId);
+  const review = await Review.findOne({ _id: reviewId, deleted: false });
   if (!review) return null;
 
   if (review.likes.includes(userId)) {
@@ -161,7 +164,7 @@ const likeReview = async (reviewId, userId) => {
 };
 
 const unlikeReview = async (reviewId, userId) => {
-  const review = await Review.findById(reviewId);
+  const review = await Review.findOne({ _id: reviewId, deleted: false });
   if (!review) return null;
 
   review.likes = review.likes.filter((id) => id.toString() !== userId);
@@ -178,7 +181,7 @@ const getEmployeeAverageRating = async (employeeId) => {
   }
 
   const result = await Review.aggregate([
-    { $match: { employee: employee._id } },
+    { $match: { employee: employee._id, deleted: false } },
     {
       $group: {
         _id: '$employee',
@@ -203,6 +206,7 @@ const getEmployeeAverageRating = async (employeeId) => {
 
 const getEmployeesByAverageRating = async () => {
   return Review.aggregate([
+    { $match: { deleted: false } },
     {
       $group: {
         _id: '$employee',
