@@ -238,6 +238,60 @@ const getEmployeesByAverageRating = async () => {
   ]);
 };
 
+const raiseConcern = async (reviewId, userId, message) => {
+  const review = await Review.findOne({ _id: reviewId, deleted: false });
+  if (!review) return null;
+
+  if (review.employee.toString() !== userId) {
+    const err = new Error('You can only raise concern for reviews written about you');
+    err.statusCode = httpStatus.FORBIDDEN;
+    throw err;
+  }
+
+  review.isVisible = false;
+  review.concernRaisedAt = new Date();
+  review.conversation.push({ sender: 'employee', message });
+
+  await review.save();
+  return review;
+};
+
+const replyConcern = async (reviewId, userId, role, message) => {
+  const review = await Review.findOne({ _id: reviewId, deleted: false });
+  if (!review) return null;
+
+  if (![review.employee.toString(), review.employer.toString()].includes(userId)) {
+    const err = new Error('You are not allowed to reply in this conversation');
+    err.statusCode = httpStatus.FORBIDDEN;
+    throw err;
+  }
+
+  review.conversation.push({ sender: role, message });
+  await review.save();
+  return review;
+};
+
+const checkReviewConcerns = async () => {
+  const reviews = await Review.find({ concernRaisedAt: { $ne: null }, isDeleted: false });
+
+  const now = new Date();
+  for (const review of reviews) {
+    const daysPassed = Math.floor((now - review.concernRaisedAt) / (1000 * 60 * 60 * 24));
+
+    if (daysPassed >= 20) {
+      const lastMsg = review.conversation[review.conversation.length - 1];
+
+      if (lastMsg?.sender === 'employee') {
+        review.isVisible = true;
+        review.concernRaisedAt = null;
+      } else if (lastMsg?.sender === 'employer') {
+        review.isDeleted = true;
+      }
+      await review.save();
+    }
+  }
+};
+
 module.exports = {
   createReview,
   getEmployeeReviews,
@@ -252,4 +306,7 @@ module.exports = {
   unlikeReview,
   getEmployeeAverageRating,
   getEmployeesByAverageRating,
+  raiseConcern,
+  replyConcern,
+  checkReviewConcerns,
 };

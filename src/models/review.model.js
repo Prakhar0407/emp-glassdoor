@@ -78,6 +78,16 @@ const reviewSchema = new mongoose.Schema(
         ref: 'User',
       },
     ],
+    isVisible: { type: Boolean, default: true },
+    concernRaisedAt: { type: Date, default: null },
+    conversation: [
+      {
+        sender: { type: String, enum: ['employee', 'employer'] },
+        message: { type: String, required: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+
     deleted: { type: Boolean, default: false },
     deleteReason: { type: String, default: null },
     deletedAt: { type: Date, default: null },

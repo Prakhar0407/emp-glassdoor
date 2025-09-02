@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const reviewService = require('../services/review.service');
 const notificationService = require('../services/notification.service');
+const Notification = require('../models/notification.model');
 
 const createReview = catchAsync(async (req, res) => {
   const review = await reviewService.createReview(req.user.id, req.params.employeeId, req.body);
@@ -9,6 +10,7 @@ const createReview = catchAsync(async (req, res) => {
   // notification for employee
   await Notification.create({
     employeeId: req.params.employeeId,
+    employerId: req.user.id,
     type: 'review',
     message: `A new review was added for you by employer with ID ${req.user.id}`,
   });
@@ -16,6 +18,7 @@ const createReview = catchAsync(async (req, res) => {
   // notification for the employer
   await Notification.create({
     employerId: req.user.id,
+    employeeId: req.params.employeeId,
     type: 'review',
     message: `You wrote a review for employee with ID ${req.params.employeeId}`,
   });
@@ -128,6 +131,19 @@ const getEmployeesByAverageRating = catchAsync(async (req, res) => {
   res.send(employees);
 });
 
+const raiseConcern = catchAsync(async (req, res) => {
+  const review = await reviewService.raiseConcern(req.params.id, req.user.id, req.body.message);
+  if (!review) return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
+  res.send({ message: 'Concern raised successfully', review });
+});
+
+const replyConcern = catchAsync(async (req, res) => {
+  const role = req.user.role;
+  const review = await reviewService.replyConcern(req.params.id, req.user.id, role, req.body.message);
+  if (!review) return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
+  res.send({ message: 'Reply added to concern successfully', review });
+});
+
 module.exports = {
   createReview,
   getEmployeeReviews,
@@ -142,4 +158,6 @@ module.exports = {
   unlikeReview,
   getEmployeeAverageRating,
   getEmployeesByAverageRating,
+  raiseConcern,
+  replyConcern,
 };

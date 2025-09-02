@@ -24,4 +24,7 @@ router.post('/:id/unlike', auth(), reviewController.unlikeReview);
 router.get('/employee/:employeeId/average-rating', reviewController.getEmployeeAverageRating);
 router.get('/employees/top-rated', reviewController.getEmployeesByAverageRating);
 
+router.post('/:id/concern', auth('raiseConcern'), reviewController.raiseConcern);
+router.post('/:id/concern/reply', auth('replyConcern'), reviewController.replyConcern);
+
 module.exports = router;

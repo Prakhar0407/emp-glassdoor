@@ -4,7 +4,12 @@ const notificationSchema = new mongoose.Schema({
   employerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Employer',
-    required: true,
+    required: false,
+  },
+  employeeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Employee',
+    required: false,
   },
   type: {
     type: String,
