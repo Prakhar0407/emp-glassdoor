@@ -11,9 +11,9 @@ const registerEmployer = async (userBody) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'All fields are required');
   }
 
-  // if (!isOfficialEmail(email, website)) {
-  //   throw new ApiError(httpStatus.BAD_REQUEST, 'Please use your official company email ID.');
-  // }
+  if (!isOfficialEmail(email, website)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Please use your official company email ID.');
+  }
 
   const employerData = { email, password, role: 'employer', isEmailVerified: false };
   const user = await userService.createUser(employerData);
