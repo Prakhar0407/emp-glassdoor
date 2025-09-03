@@ -23,6 +23,7 @@ const createReview = async (employerId, employeeId, body) => {
     rating: body.rating,
     headline: body.headline,
     comment: body.comment,
+    showEmployerName: body.showEmployerName ?? true,
   });
 };
 

@@ -32,10 +32,19 @@ const getCompanyDetails = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).json(company);
 });
 
+const addEmployerName = catchAsync(async (req, res) => {
+  const employerId = req.user.id;
+  const { name } = req.body;
+
+  const result = await employerService.addEmployerName(employerId, name);
+  res.status(httpStatus.OK).json(result);
+});
+
 module.exports = {
   register,
   login,
   logout,
   updateCompanyDetails,
   getCompanyDetails,
+  addEmployerName,
 };

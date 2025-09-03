@@ -13,4 +13,6 @@ router.post('/logout', validate(authValidation.logout), employerController.logou
 router.post('/company', auth(), employerController.updateCompanyDetails);
 router.get('/company', auth(), employerController.getCompanyDetails);
 
+router.post('/add-name', auth(), employerController.addEmployerName);
+
 module.exports = router;

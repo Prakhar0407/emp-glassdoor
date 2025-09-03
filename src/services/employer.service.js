@@ -11,9 +11,9 @@ const registerEmployer = async (userBody) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'All fields are required');
   }
 
-  if (!isOfficialEmail(email, website)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Please use your official company email ID.');
-  }
+  // if (!isOfficialEmail(email, website)) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, 'Please use your official company email ID.');
+  // }
 
   const employerData = { email, password, role: 'employer', isEmailVerified: false };
   const user = await userService.createUser(employerData);
@@ -69,10 +69,23 @@ const getCompanyDetails = async (employerId) => {
   return company;
 };
 
+const addEmployerName = async (employerId, name) => {
+  const employer = await userService.getUserById(employerId);
+  if (!employer || employer.role !== 'employer') {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Employer not found');
+  }
+
+  employer.name = name;
+  await employer.save();
+
+  return { message: 'Employer name added successfully', employer };
+};
+
 module.exports = {
   registerEmployer,
   loginEmployer,
   logoutEmployer,
   updateCompanyDetails,
   getCompanyDetails,
+  addEmployerName,
 };

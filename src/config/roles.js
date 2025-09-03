@@ -1,6 +1,6 @@
 const allRoles = {
   employee: ['viewOwnProfile', 'replyReview', 'reportReview', 'getNotifications', 'raiseConcern'],
-  employer: ['createReview', 'viewEmployees', 'getNotifications', 'markNotification', 'replyConcern'],
+  employer: ['createReview', 'viewEmployees', 'getNotifications', 'markNotification', 'replyConcern', 'addEmployerName'],
   admin: [
     'getUsers',
     'manageUsers',
