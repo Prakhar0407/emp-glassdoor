@@ -26,6 +26,11 @@ app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 // Routes
 app.use('/v1', routes);
 
+// Serve static files if local storage
+if (process.env.STORAGE_TYPE === 'local') {
+  app.use('/uploads', express.static('uploads'));
+}
+
 // Error Handling
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));

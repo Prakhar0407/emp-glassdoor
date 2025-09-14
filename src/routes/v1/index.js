@@ -8,6 +8,7 @@ const employeeRoute = require('./employee.route');
 const employerRoute = require('./employer.route');
 const adminRoute = require('./admin.route');
 const notificationRoute = require('./notification.route');
+const uploadRoute = require('./upload.route');
 
 const config = require('../../config/config');
 
@@ -49,6 +50,10 @@ const defaultRoutes = [
   {
     path: '/notifications',
     route: notificationRoute,
+  },
+  {
+    path: '/upload',
+    route: uploadRoute,
   },
 ];
 
