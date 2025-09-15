@@ -74,6 +74,26 @@ const userSchema = mongoose.Schema(
       type: [String],
       default: [],
     },
+    workHistory: [
+      {
+        company: { type: String, required: true, trim: true },
+        position: { type: String, required: true, trim: true },
+        startDate: { type: Date, required: true },
+        endDate: { type: Date },
+        employmentType: {
+          type: String,
+          enum: ['intern', 'full time'],
+          default: 'full time',
+        },
+        location: { type: String, default: '' },
+        locationType: {
+          type: String,
+          enum: ['remote', 'onsite', 'hybrid'],
+          default: 'onsite',
+        },
+        description: { type: String, default: '' },
+      },
+    ],
   },
 
   {

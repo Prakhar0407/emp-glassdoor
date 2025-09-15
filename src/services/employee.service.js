@@ -62,7 +62,24 @@ const updateEmployeeProfile = async (
   }
   if (workHistory) {
     if (!Array.isArray(workHistory)) throw new Error('Work history must be an array');
-    employee.workHistory = workHistory;
+    employee.workHistory = workHistory.map((job) => {
+      const { company, position, startDate, endDate, employmentType, location, locationType, description } = job;
+
+      if (!company || !position || !startDate) {
+        throw new Error('Each work history entry must have company, position, and startDate');
+      }
+
+      return {
+        company: company.trim(),
+        position: position.trim(),
+        startDate,
+        endDate: endDate || null,
+        employmentType: employmentType?.trim() || 'full time',
+        location: location?.trim() || '',
+        locationType: locationType?.trim() || 'onsite',
+        description: description?.trim() || '',
+      };
+    });
   }
   if (resume) employee.resume = resume;
   await employee.save();
