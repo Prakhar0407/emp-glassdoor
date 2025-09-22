@@ -1,11 +1,11 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const passport = require('passport');
+const httpStatus = require('http-status');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const routes = require('./routes/v1');
-const passport = require('passport');
-const httpStatus = require('http-status');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 

@@ -94,14 +94,14 @@ const likeReview = catchAsync(async (req, res) => {
     return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
   }
 
-  //notification to employer
+  // notification to employer
   await notificationService.createNotification(
     req.user.id, // employerId
     'like',
     `You liked a review with ID ${req.params.id}` // message
   );
 
-  //notification to employee
+  // notification to employee
   await notificationService.createNotification(
     review.employee, // employeeId
     'like',
@@ -138,7 +138,7 @@ const raiseConcern = catchAsync(async (req, res) => {
 });
 
 const replyConcern = catchAsync(async (req, res) => {
-  const role = req.user.role;
+  const { role } = req.user;
   const review = await reviewService.replyConcern(req.params.id, req.user.id, role, req.body.message);
   if (!review) return res.status(httpStatus.NOT_FOUND).send({ message: 'Review not found' });
   res.send({ message: 'Reply added to concern successfully', review });

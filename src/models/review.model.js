@@ -47,7 +47,7 @@ const reviewSchema = new mongoose.Schema(
       required: true,
     },
     rating: { type: Number, min: 1, max: 5, required: true },
-    showEmployerName: {type: Boolean, default: true},
+    showEmployerName: { type: Boolean, default: true },
     headline: { type: String, trim: true },
     comment: { type: String, trim: true },
     reply: {

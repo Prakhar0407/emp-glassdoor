@@ -1,8 +1,9 @@
 const express = require('express');
+
 const router = express.Router();
+const moment = require('moment');
 const tokenService = require('../../services/token.service');
 const { tokenTypes } = require('../../config/tokens');
-const moment = require('moment');
 
 // Dummy user
 const dummyUser = {

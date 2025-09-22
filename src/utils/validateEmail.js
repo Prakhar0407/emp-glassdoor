@@ -23,7 +23,7 @@ function isOfficialEmail(email, website) {
   }
 
   // email domain matches or contains website domain
-  if (!(emailDomain === siteDomain || emailDomain.endsWith('.' + siteDomain))) {
+  if (!(emailDomain === siteDomain || emailDomain.endsWith(`.${siteDomain}`))) {
     return false;
   }
 
