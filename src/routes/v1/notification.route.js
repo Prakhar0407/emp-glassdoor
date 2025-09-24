@@ -4,7 +4,7 @@ const notificationController = require('../../controllers/notification.controlle
 
 const router = express.Router();
 
-router.get('/', auth('getNotifications'), notificationController.getEmployerNotifications);
+router.get('/', auth('getNotifications'), notificationController.getNotifications);
 router.patch('/:id/read', auth('markNotification'), notificationController.markNotificationAsRead);
 
 module.exports = router;

@@ -2,15 +2,24 @@ const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const notificationService = require('../services/notification.service');
 
-const getEmployerNotifications = catchAsync(async (req, res) => {
-  const employerId = req.user.id;
-  const notifications = await notificationService.getNotifications(employerId);
+const getNotifications = catchAsync(async (req, res) => {
+  const userId = req.user.id;
+  const role = req.user.role;
+
+  let notifications;
+  if (role === 'employer') {
+    notifications = await notificationService.getEmployerNotifications(userId);
+  } else if (role === 'employee') {
+    notifications = await notificationService.getEmployeeNotifications(userId);
+  } else {
+    return res.status(httpStatus.FORBIDDEN).send({ message: 'Invalid role' });
+  }
+
   res.status(httpStatus.OK).send({ notifications });
 });
 
 const markNotificationAsRead = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const employerId = req.user.id;
 
   const notification = await notificationService.markAsRead(id, employerId);
 
@@ -22,6 +31,6 @@ const markNotificationAsRead = catchAsync(async (req, res) => {
 });
 
 module.exports = {
-  getEmployerNotifications,
+  getNotifications,
   markNotificationAsRead,
 };
