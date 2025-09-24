@@ -49,6 +49,14 @@ const userSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    employerViews: {
+      type: Number,
+      default: 0,
+    },
+    employeeViews: {
+      type: Number,
+      default: 0,
+    },
     avatar: {
       type: String,
     },

@@ -18,7 +18,12 @@ const viewEmployeeProfile = catchAsync(async (req, res) => {
   if (!employee) {
     return res.status(httpStatus.NOT_FOUND).send({ message: 'Employee not found' });
   }
-  res.send({ message: 'Profile view recorded' });
+  res.send({
+    message: 'Profile view recorded',
+    employerViews: employee.employerViews,
+    employeeViews: employee.employeeViews,
+    totalViews: (employee.employerViews || 0) + (employee.employeeViews || 0),
+  });
 });
 
 const searchEmployees = catchAsync(async (req, res) => {

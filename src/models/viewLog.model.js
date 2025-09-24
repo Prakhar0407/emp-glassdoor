@@ -12,6 +12,11 @@ const viewLogSchema = mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    viewerType: {
+      type: String,
+      enum: ['employer', 'employee'],
+      required: true,
+    },
     viewedAt: {
       type: Date,
       default: Date.now,

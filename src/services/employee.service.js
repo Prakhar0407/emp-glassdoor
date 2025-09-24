@@ -22,10 +22,18 @@ const incrementProfileView = async (employeeId, viewerId) => {
   const employee = await User.findById(employeeId);
   if (!employee || employee.role !== 'employee') return null;
 
-  employee.profileViews = (employee.profileViews || 0) + 1;
+  const viewer = await User.findById(viewerId);
+  if (!viewer) return null;
+
+  const viewerType = viewer.role === 'employer' ? 'employer' : 'employee';
+  if (viewerType === 'employer') {
+    employee.employerViews = (employee.employerViews || 0) + 1;
+  } else {
+    employee.employeeViews = (employee.employeeViews || 0) + 1;
+  }
   await employee.save();
 
-  await ViewLog.create({ employee: employeeId, viewer: viewerId });
+  await ViewLog.create({ employee: employeeId, viewer: viewerId, viewerType });
   return employee;
 };
 
