@@ -1,6 +1,13 @@
 const { User } = require('../models');
 const Review = require('../models/review.model');
 const ViewLog = require('../models/viewLog.model');
+const {
+  EMPLOYMENT_STATUSES,
+  JOB_TITLES,
+  INDUSTRIES,
+  SPECIALIZATIONS,
+  LOCATIONS,
+} = require('../constants/employee.constants');
 
 const getEmployeeProfile = async (employeeId) => {
   const employee = await User.findById(employeeId).select('-password');
@@ -53,23 +60,66 @@ const searchEmployees = async (query) => {
 
 const updateEmployeeProfile = async (
   employeeId,
-  { employmentStatus, jobTitle, employer, location, primaryIndustry, specialization, skills, workHistory, resume }
+  { employmentStatus, jobTitle, employer, location, primaryIndustry, specializations, skills, workHistory, resume }
 ) => {
   const employee = await User.findById(employeeId);
   if (!employee || employee.role !== 'employee') return null;
 
-  if (employmentStatus) employee.employmentStatus = employmentStatus.trim();
-  if (jobTitle) employee.jobTitle = jobTitle.trim();
+  // Employment Status
+  if (employmentStatus !== undefined) {
+    const id = Number(employmentStatus);
+    const found = EMPLOYMENT_STATUSES.find((s) => s.id === id);
+    if (!found) throw new Error(`Invalid employment status`);
+    employee.employmentStatus = found.label;
+  }
+
+  // Job Title
+  if (jobTitle !== undefined) {
+    const id = Number(jobTitle);
+    const found = JOB_TITLES.find((j) => j.id === id);
+    if (!found) throw new Error('Invalid job title');
+    employee.jobTitle = found.label;
+  }
+
+  // Employer
   if (employer) employee.employer = employer.trim();
-  if (location) employee.location = location.trim();
-  if (primaryIndustry) employee.primaryIndustry = primaryIndustry.trim();
-  if (specialization) employee.specialization = specialization.trim();
+
+  // Location
+  if (location !== undefined) {
+    const id = Number(location);
+    const found = LOCATIONS.find((l) => l.id === id);
+    if (!found) throw new Error('Invalid location');
+    employee.location = found.label;
+  }
+
+  // Primary Industry
+  if (primaryIndustry !== undefined) {
+    const id = Number(primaryIndustry);
+    const found = INDUSTRIES.find((i) => i.id === id);
+    if (!found) throw new Error('Invalid industry');
+    employee.primaryIndustry = found.label;
+  }
+
+  // Specializations
+  if (specializations !== undefined) {
+    if (!Array.isArray(specializations)) throw new Error('Specializations must be an array');
+    employee.specializations = specializations.map((id) => {
+      const found = SPECIALIZATIONS.find((s) => s.id === Number(id));
+      if (!found) throw new Error(`Invalid specialization ID: ${id}`);
+      return found.label;
+    });
+  }
+
+  // Skills
   if (skills) {
     if (!Array.isArray(skills)) throw new Error('Skills must be an array');
     employee.skills = skills.map((s) => s.trim().toLowerCase());
   }
+
+  // Work History
   if (workHistory) {
     if (!Array.isArray(workHistory)) throw new Error('Work history must be an array');
+
     employee.workHistory = workHistory.map((job) => {
       const { company, position, startDate, endDate, employmentType, location, locationType, description } = job;
 
@@ -77,19 +127,38 @@ const updateEmployeeProfile = async (
         throw new Error('Each work history entry must have company, position, and startDate');
       }
 
+      let employmentTypeLabel = 'Full-Time';
+      if (employmentType !== undefined) {
+        const typeId = Number(employmentType);
+        const foundType = EMPLOYMENT_STATUSES.find((s) => s.id === typeId);
+        if (!foundType) throw new Error(`Invalid employment type ID: ${employmentType}`);
+        employmentTypeLabel = foundType.label;
+      }
+
+      let locationLabel = '';
+      if (location !== undefined) {
+        const locId = Number(location);
+        const foundLoc = LOCATIONS.find((l) => l.id === locId);
+        if (!foundLoc) throw new Error(`Invalid location ID: ${location}`);
+        locationLabel = foundLoc.label;
+      }
+
       return {
         company: company.trim(),
         position: position.trim(),
         startDate,
         endDate: endDate || null,
-        employmentType: employmentType?.trim() || 'full time',
-        location: location?.trim() || '',
+        employmentType: employmentTypeLabel,
+        location: locationLabel,
         locationType: locationType?.trim() || 'onsite',
         description: description?.trim() || '',
       };
     });
   }
+
+  // Resume
   if (resume) employee.resume = resume;
+
   await employee.save();
   return employee;
 };

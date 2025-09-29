@@ -3,6 +3,21 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { toJSON, paginate } = require('./plugins');
 const { roles } = require('../config/roles');
+const {
+  EMPLOYMENT_STATUSES,
+  JOB_TITLES,
+  INDUSTRIES,
+  SPECIALIZATIONS,
+  LOCATION_TYPES,
+  LOCATIONS,
+} = require('../constants/employee.constants');
+
+const EMPLOYMENT_STATUS_LABELS = EMPLOYMENT_STATUSES.map((s) => s.label);
+const JOB_TITLE_LABELS = JOB_TITLES.map((j) => j.label);
+const LOCATION_TYPE_LABELS = LOCATION_TYPES.map((l) => l.label);
+const LOCATION_LABELS = LOCATIONS.map((l) => l.label);
+const INDUSTRY_LABELS = INDUSTRIES.map((i) => i.label);
+const SPECIALIZATION_LABELS = SPECIALIZATIONS.map((s) => s.label);
 
 const userSchema = mongoose.Schema(
   {
@@ -72,12 +87,23 @@ const userSchema = mongoose.Schema(
       sparse: true,
     },
 
-    employmentStatus: { type: String, default: '' },
-    jobTitle: { type: String, default: '' },
+    employmentStatus: {
+      type: String,
+      enum: EMPLOYMENT_STATUS_LABELS,
+      default: '',
+    },
+    jobTitle: { type: String, enum: JOB_TITLE_LABELS, default: '' },
     employer: { type: String, default: '' },
-    location: { type: String, default: '' },
-    primaryIndustry: { type: String, default: '' },
-    specialization: { type: String, default: '' },
+    location: { type: String, enum: LOCATION_LABELS, default: '' },
+    primaryIndustry: { type: String, enum: INDUSTRY_LABELS, default: '' },
+    specializations: {
+      type: [String],
+      enum: SPECIALIZATION_LABELS,
+      validate: {
+        validator: (val) => val.length >= 1 && val.length <= 5,
+        message: 'Select minimum 1 and maximum 5 specializations',
+      },
+    },
     skills: {
       type: [String],
       default: [],
@@ -90,15 +116,11 @@ const userSchema = mongoose.Schema(
         endDate: { type: Date },
         employmentType: {
           type: String,
-          enum: ['intern', 'full time'],
-          default: 'full time',
+          enum: EMPLOYMENT_STATUS_LABELS,
+          default: EMPLOYMENT_STATUS_LABELS[0],
         },
-        location: { type: String, default: '' },
-        locationType: {
-          type: String,
-          enum: ['remote', 'onsite', 'hybrid'],
-          default: 'onsite',
-        },
+        location: { type: String, enum: LOCATION_LABELS, default: '' },
+        locationType: { type: String, enum: ['remote', 'onsite', 'hybrid'], default: 'onsite' },
         description: { type: String, default: '' },
       },
     ],

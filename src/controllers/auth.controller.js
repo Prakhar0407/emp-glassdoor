@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { authService, userService, tokenService, emailService } = require('../services');
 const User = require('../models/user.model');
 const fetch = require('node-fetch');
+const { uploadLinkedInAvatar } = require('../services/s3.service');
 
 const refreshTokens = catchAsync(async (req, res) => {
   const tokens = await authService.refreshAuth(req.body.refreshToken);

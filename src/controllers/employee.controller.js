@@ -44,7 +44,7 @@ const updateEmployeeProfileDetails = catchAsync(async (req, res) => {
       employer: employee.employer,
       location: employee.location,
       primaryIndustry: employee.primaryIndustry,
-      specialization: employee.specialization,
+      specializations: employee.specializations,
       skills: employee.skills || [],
       workHistory: employee.workHistory,
       resume: employee.resume || null,
