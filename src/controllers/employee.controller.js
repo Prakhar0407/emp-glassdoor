@@ -54,9 +54,18 @@ const updateEmployeeProfileDetails = catchAsync(async (req, res) => {
   }
 });
 
+const getProfileOptions = catchAsync(async (req, res) => {
+  const options = employeeService.getProfileOptions();
+  res.send({
+    message: 'Profile options fetched successfully',
+    ...options,
+  });
+});
+
 module.exports = {
   getEmployeeProfile,
   viewEmployeeProfile,
   searchEmployees,
   updateEmployeeProfileDetails,
+  getProfileOptions,
 };

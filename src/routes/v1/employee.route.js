@@ -9,6 +9,7 @@ const { updateEmployeeProfileDetails } = require('../../controllers/employee.con
 const router = express.Router();
 
 router.post('/:id/view', auth(), employeeController.viewEmployeeProfile);
+router.get('/profile-options', auth(), employeeController.getProfileOptions);
 router.get('/:id', auth(), employeeController.getEmployeeProfile);
 router.get('/', auth(), employeeController.searchEmployees);
 

@@ -163,9 +163,20 @@ const updateEmployeeProfile = async (
   return employee;
 };
 
+const getProfileOptions = () => {
+  return {
+    employmentStatuses: EMPLOYMENT_STATUSES,
+    jobTitles: JOB_TITLES,
+    industries: INDUSTRIES,
+    specializations: SPECIALIZATIONS,
+    locations: LOCATIONS,
+  };
+};
+
 module.exports = {
   getEmployeeProfile,
   incrementProfileView,
   searchEmployees,
   updateEmployeeProfile,
+  getProfileOptions,
 };
